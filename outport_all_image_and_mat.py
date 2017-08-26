@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib as mlt
 import cv2
 import glob,os
+import scipy.io as sio
 from shutil import copyfile
 from os import listdir
 from os.path import isfile, join
@@ -31,10 +32,15 @@ def process_all_mat(image_files_list):
         mat_file_list.append(mat_name);
     return mat_file_list;
 
+def convert_mat_to_img(mat_file):
+    mat = sio.loadmat(mat_file);
+    image = mat['seglabel'];
+    return image;
+
+dir_name = '../all_data';
+txt_file = open('train.txt','w+');
 image_files_list = list_all_image_files_in_dir("./", ".jpg");
 mat_file_list = process_all_mat(image_files_list);
-# exit(0)
-dir_name = '../all_data';
 if  False == os.path.exists(dir_name):
     os.mkdir(dir_name);
 for i in range(1,len(image_files_list)):
@@ -47,6 +53,13 @@ for i in range(1,len(image_files_list)):
     # cv2.waitKey(1);
     spl = str.split(image_file,'/');
     prefix = spl[len(spl)-3];
-    copyfile(image_file, dir_name + '/' +prefix + '.jpg');
-    copyfile(mat_file, dir_name + '/' + prefix + '.mat');
-print(a)
+    mat_img = convert_mat_to_img(mat_file);
+    ############save file##########
+    out_raw_image_name = dir_name + '/' +prefix + '.jpg';
+    out_seg_image_name = dir_name + '/' + prefix + '_seg.jpg';
+    out_mat_file_name = dir_name + '/' + prefix + '.mat';
+    txt_file.write(out_raw_image_name+' '+out_seg_image_name+'\n');
+    copyfile(image_file, out_raw_image_name);
+    # copyfile(mat_file, out_mat_file_name);
+    cv2.imwrite(out_seg_image_name , mat_img);
+txt_file.close();
