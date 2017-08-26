@@ -39,3 +39,4 @@ I = cv2.imread('./kv1/NYUdata/NYU0001/image/NYU0001.jpg');
 cv2.imshow('img',I);
 cv2.waitKey();
 print(a)
+ 
